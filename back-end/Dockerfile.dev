@@ -1,0 +1,15 @@
+# back-end/Dockerfile.dev
+
+FROM node:20-alpine
+WORKDIR /usr/src/app
+
+# 1) instala deps uma só vez
+COPY package*.json ./
+RUN npm ci
+
+# 2) monta todo o código
+COPY . .
+
+EXPOSE 3000
+# usa o watch do Nest para recarregar a cada alteração
+CMD ["npm", "run", "start:dev"]

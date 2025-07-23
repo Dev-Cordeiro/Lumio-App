@@ -1,0 +1,66 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    image: meu-backend-nest
+    container_name: backend
+    env_file:
+      - ./back-end/config/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
+  worker-gemini:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-gemini
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-gemini.ts
+
+  worker-validacao:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-validacao
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-validacao.ts
+
+  worker-save:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-save
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-save.ts
+
+volumes:
+  backend_node_modules:

@@ -1,0 +1,58 @@
+services:
+  backend:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    env_file:
+      - ./back-end/config/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./back-end:/usr/src/app
+      - backend_node_modules:/usr/src/app/node_modules
+    command: npm run start:dev
+
+  worker-gemini:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-gemini-dev
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-gemini.ts
+
+  worker-validacao:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-validacao-dev
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-validacao.ts
+
+  worker-save:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: worker-save-dev
+    env_file:
+      - ./back-end/config/.env
+    volumes:
+      - ./back-end:/usr/src/app
+    depends_on:
+      - rabbitmq
+    command: npx ts-node src/workers/worker-save.ts
+
+volumes:
+  backend_node_modules:

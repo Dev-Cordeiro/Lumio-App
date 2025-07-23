@@ -1,0 +1,1 @@
+export const GOOGLE_PLACES_API_KEY = 'AIzaSyDDU7Fn0rLCK0G6JSsvG7ax4i3yU4aB38c'; // Substitua pela sua chave real 
